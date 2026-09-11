@@ -93,15 +93,13 @@ export default async function TeacherPendingPage() {
             <span>تواصل فوراً مع الإدارة لتفعيل الحساب (واتساب)</span>
           </a>
 
-          <form action="/api/auth/logout" method="POST" className="w-full sm:w-auto">
-            <button
-              type="submit"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-sm px-6 py-4 rounded-2xl transition-all border border-slate-700"
-            >
-              <LogOut className="w-4 h-4" />
-              <span>تسجيل الخروج</span>
-            </button>
-          </form>
+          <a
+            href="/api/auth/logout"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-sm px-6 py-4 rounded-2xl transition-all border border-slate-700"
+          >
+            <LogOut className="w-4 h-4" />
+            <span>تسجيل الخروج</span>
+          </a>
         </div>
       </div>
     </div>
