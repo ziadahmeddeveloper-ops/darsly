@@ -132,7 +132,7 @@ export default function TeacherSchedulesPage() {
   };
 
   return (
-    <div className="flex min-h-screen bg-slate-950">
+    <div className="flex flex-col md:flex-row min-h-screen bg-slate-950">
       <Sidebar role="teacher" teacherStatus="approved" />
 
       {/* Toast Alert */}

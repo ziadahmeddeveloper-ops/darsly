@@ -143,7 +143,7 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen bg-slate-950">
+      <div className="flex flex-col md:flex-row min-h-screen bg-slate-950">
         <Sidebar role={userData?.role || 'student'} teacherStatus={userData?.status} />
         <main className="flex-1 flex items-center justify-center">
           <p className="text-slate-400 text-sm animate-pulse">جاري تحميل الملف الشخصي...</p>
@@ -153,7 +153,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="flex min-h-screen bg-slate-950">
+    <div className="flex flex-col md:flex-row min-h-screen bg-slate-950">
       <Sidebar role={userData?.role || 'student'} teacherStatus={userData?.status} />
 
       {/* Toast */}

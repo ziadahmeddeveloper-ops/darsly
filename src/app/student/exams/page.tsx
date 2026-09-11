@@ -16,7 +16,7 @@ export default async function StudentExamsPage() {
   });
 
   return (
-    <div className="flex min-h-screen bg-slate-950">
+    <div className="flex flex-col md:flex-row min-h-screen bg-slate-950">
       <Sidebar role="student" />
 
       <main className="flex-1 p-6 sm:p-10 space-y-8 max-w-7xl mx-auto">

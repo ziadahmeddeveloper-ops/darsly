@@ -207,7 +207,7 @@ export default function TeacherCreateCoursePage() {
   };
 
   return (
-    <div className="flex min-h-screen bg-slate-950">
+    <div className="flex flex-col md:flex-row min-h-screen bg-slate-950">
       <Sidebar role="teacher" teacherStatus="approved" />
 
       <main className="flex-1 p-6 sm:p-10 space-y-6 max-w-4xl mx-auto">
