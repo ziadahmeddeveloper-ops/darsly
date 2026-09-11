@@ -1,7 +1,5 @@
 import { NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
-import { writeFile, mkdir } from 'fs/promises';
-import path from 'path';
 
 export async function POST(request: Request) {
   try {
@@ -12,7 +10,7 @@ export async function POST(request: Request) {
 
     const formData = await request.formData();
     const file = formData.get('file') as File | null;
-    const type = (formData.get('type') as string) || 'images'; // covers, avatars, images
+    const type = (formData.get('type') as string) || 'images';
 
     if (!file) {
       return NextResponse.json({ success: false, message: 'لم يتم اختيار أي ملف.' }, { status: 400 });
@@ -27,28 +25,19 @@ export async function POST(request: Request) {
       );
     }
 
-    // Max size: 10MB
-    const maxSize = 10 * 1024 * 1024;
+    // Max size: 4MB for Base64 cloud storage efficiency
+    const maxSize = 4 * 1024 * 1024;
     if (file.size > maxSize) {
       return NextResponse.json(
-        { success: false, message: 'حجم الصورة كبير جداً. الحد الأقصى 10MB.' },
+        { success: false, message: 'حجم الصورة كبير جداً. الحد الأقصى 4MB.' },
         { status: 400 }
       );
     }
 
-    const ext = file.name.split('.').pop() || 'jpg';
-    const filename = `${user.id}-${Date.now()}-${Math.random().toString(36).substring(2, 7)}.${ext}`;
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads', type);
-    const filepath = path.join(uploadDir, filename);
-
-    // Ensure directory exists
-    await mkdir(uploadDir, { recursive: true });
-
-    // Write file
+    // Convert file buffer to Base64 Data URL for serverless compatibility
     const buffer = Buffer.from(await file.arrayBuffer());
-    await writeFile(filepath, buffer);
-
-    const imageUrl = `/uploads/${type}/${filename}`;
+    const mimeType = file.type || 'image/jpeg';
+    const imageUrl = `data:${mimeType};base64,${buffer.toString('base64')}`;
 
     return NextResponse.json({
       success: true,

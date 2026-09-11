@@ -1,7 +1,5 @@
 import { NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
-import { writeFile, mkdir } from 'fs/promises';
-import path from 'path';
 
 export async function POST(request: Request) {
   try {
@@ -26,28 +24,21 @@ export async function POST(request: Request) {
       );
     }
 
-    // Max size: 200MB
-    const maxSize = 200 * 1024 * 1024;
-    if (file.size > maxSize) {
+    // Serverless cloud storage check: Large direct video files cannot be saved to serverless memory
+    if (file.size > 8 * 1024 * 1024) {
       return NextResponse.json(
-        { success: false, message: 'حجم ملف الفيديو كبير جداً. الحد الأقصى 200MB.' },
+        { 
+          success: false, 
+          message: 'على السيرفر السحابي المجاني، يرجى إدخال رابط فيديو يوتيوب مباشرة للحصول على أداء ممتاز وبدون حدود للحجم.' 
+        },
         { status: 400 }
       );
     }
 
-    const ext = file.name.split('.').pop() || 'mp4';
-    const filename = `lesson-video-${user.id}-${Date.now()}-${Math.random().toString(36).substring(2, 7)}.${ext}`;
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'videos');
-    const filepath = path.join(uploadDir, filename);
-
-    // Ensure upload directory exists
-    await mkdir(uploadDir, { recursive: true });
-
-    // Write file
+    // Small video fallback as Data URL
     const buffer = Buffer.from(await file.arrayBuffer());
-    await writeFile(filepath, buffer);
-
-    const videoUrl = `/uploads/videos/${filename}`;
+    const mimeType = file.type || 'video/mp4';
+    const videoUrl = `data:${mimeType};base64,${buffer.toString('base64')}`;
 
     return NextResponse.json({
       success: true,

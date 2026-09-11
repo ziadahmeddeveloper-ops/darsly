@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { writeFile, mkdir } from 'fs/promises';
-import path from 'path';
 
 export async function POST(request: Request) {
   try {
@@ -36,21 +34,12 @@ export async function POST(request: Request) {
       );
     }
 
-    // Build unique filename: userId-timestamp.ext
-    const ext = file.name.split('.').pop() || 'jpg';
-    const filename = `${user.id}-${Date.now()}.${ext}`;
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'avatars');
-    const filepath = path.join(uploadDir, filename);
-
-    // Ensure directory exists
-    await mkdir(uploadDir, { recursive: true });
-
-    // Write the file
+    // Convert file buffer to Base64 Data URL for serverless compatibility
     const buffer = Buffer.from(await file.arrayBuffer());
-    await writeFile(filepath, buffer);
+    const mimeType = file.type || 'image/jpeg';
+    const avatarUrl = `data:${mimeType};base64,${buffer.toString('base64')}`;
 
-    // Persist the public URL to the user record
-    const avatarUrl = `/uploads/avatars/${filename}`;
+    // Persist the URL to the user record
     await prisma.user.update({
       where: { id: user.id },
       data: { avatar: avatarUrl },
