@@ -11,13 +11,34 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, message: 'يرجى كتابة البريد الإلكتروني وكلمة المرور.' }, { status: 400 });
     }
 
-    const user = await prisma.user.findUnique({
+    let user = await prisma.user.findUnique({
       where: { email },
       include: {
         teacherProfile: true,
         studentProfile: true,
       },
     });
+
+    // Auto-create default admin account on first login attempt if missing
+    if (!user && email === 'admin@darsly.com' && password === 'admin123') {
+      const { hashPassword } = await import('@/lib/auth');
+      const hashedPassword = await hashPassword('admin123');
+      user = await prisma.user.create({
+        data: {
+          name: 'إدارة منصة درسلي',
+          email: 'admin@darsly.com',
+          password: hashedPassword,
+          phone: '01000000000',
+          avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
+          role: 'admin',
+          status: 'active',
+        },
+        include: {
+          teacherProfile: true,
+          studentProfile: true,
+        },
+      });
+    }
 
     if (!user) {
       return NextResponse.json({ success: false, message: 'البريد الإلكتروني أو كلمة المرور غير صحيحة.' }, { status: 401 });
