@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Sparkles, MessageCircle, BookOpen, Calendar, Star, User, LogOut, ChevronDown, LayoutDashboard, ShieldCheck } from 'lucide-react';
+import { Sparkles, MessageCircle, BookOpen, Calendar, Star, User, LogOut, ChevronDown, LayoutDashboard, ShieldCheck, Menu, X } from 'lucide-react';
 
 interface TeacherSubsiteHeaderProps {
   teacher: {
@@ -27,6 +27,7 @@ interface TeacherSubsiteHeaderProps {
 
 export default function TeacherSubsiteHeader({ teacher, currentUser }: TeacherSubsiteHeaderProps) {
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const teacherSlug = teacher.customSlug || teacher.id;
   const whatsappNum = teacher.teacherProfile?.whatsapp;
 
@@ -54,11 +55,11 @@ export default function TeacherSubsiteHeader({ teacher, currentUser }: TeacherSu
             </div>
 
             <div className="flex flex-col">
-              <span className="text-lg font-black text-white group-hover:text-blue-400 transition-colors flex items-center gap-1.5">
+              <span className="text-base sm:text-lg font-black text-white group-hover:text-blue-400 transition-colors flex items-center gap-1.5">
                 منصة الأستاذ {teacher.name}
                 <Sparkles className="w-4 h-4 text-amber-400 fill-amber-400" />
               </span>
-              <span className="text-xs text-blue-400 font-semibold truncate max-w-[200px]">
+              <span className="text-xs text-blue-400 font-semibold truncate max-w-[160px] sm:max-w-[220px]">
                 {teacher.teacherProfile?.title || 'الموقع التعليمي الرسمي'}
               </span>
             </div>
@@ -122,7 +123,7 @@ export default function TeacherSubsiteHeader({ teacher, currentUser }: TeacherSu
                       <User className="w-3.5 h-3.5 text-blue-400" />
                     )}
                   </div>
-                  <span className="text-xs font-bold text-white max-w-[100px] truncate">{currentUser.name}</span>
+                  <span className="text-xs font-bold text-white max-w-[80px] sm:max-w-[100px] truncate">{currentUser.name}</span>
                   <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
                 </button>
 
@@ -174,14 +175,71 @@ export default function TeacherSubsiteHeader({ teacher, currentUser }: TeacherSu
               <div className="flex items-center gap-2">
                 <Link
                   href={`/login?callback=/t/${teacherSlug}`}
-                  className="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-lg shadow-blue-600/30 transition-all"
+                  className="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-3.5 sm:px-4 py-2 rounded-xl shadow-lg shadow-blue-600/30 transition-all"
                 >
                   تسجيل الدخول
                 </Link>
               </div>
             )}
+
+            {/* Mobile Menu Toggle Button */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="lg:hidden p-2 text-slate-300 hover:text-white bg-slate-900 border border-slate-800 rounded-xl"
+            >
+              {mobileMenuOpen ? <X className="w-5 h-5 text-rose-400" /> : <Menu className="w-5 h-5 text-blue-400" />}
+            </button>
           </div>
         </div>
+
+        {/* Mobile Navigation Dropdown Menu */}
+        {mobileMenuOpen && (
+          <div className="lg:hidden py-4 border-t border-slate-800 space-y-2.5 animate-in fade-in slide-in-from-top-2 duration-200">
+            <Link
+              href={`/t/${teacherSlug}`}
+              onClick={() => setMobileMenuOpen(false)}
+              className="block text-sm font-bold text-white bg-slate-900 border border-slate-800 px-4 py-2.5 rounded-xl"
+            >
+              الرئيسية
+            </Link>
+            <Link
+              href={`/t/${teacherSlug}#courses`}
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center gap-2 text-sm font-bold text-slate-200 bg-slate-900 border border-slate-800 px-4 py-2.5 rounded-xl"
+            >
+              <BookOpen className="w-4 h-4 text-blue-400" />
+              الكورسات والمحاضرات
+            </Link>
+            <Link
+              href={`/t/${teacherSlug}#schedules`}
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center gap-2 text-sm font-bold text-slate-200 bg-slate-900 border border-slate-800 px-4 py-2.5 rounded-xl"
+            >
+              <Calendar className="w-4 h-4 text-emerald-400" />
+              جدول السناتر
+            </Link>
+            <Link
+              href={`/t/${teacherSlug}#reviews`}
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center gap-2 text-sm font-bold text-slate-200 bg-slate-900 border border-slate-800 px-4 py-2.5 rounded-xl"
+            >
+              <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+              آراء الطلاب
+            </Link>
+
+            {whatsappNum && (
+              <a
+                href={`https://wa.me/${whatsappNum.replace(/\+/g, '')}`}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center justify-center gap-2 bg-emerald-600/20 text-emerald-400 font-bold text-xs p-3 rounded-xl border border-emerald-500/30"
+              >
+                <MessageCircle className="w-4 h-4" />
+                <span>التواصل عبر واتساب</span>
+              </a>
+            )}
+          </div>
+        )}
       </div>
     </header>
   );

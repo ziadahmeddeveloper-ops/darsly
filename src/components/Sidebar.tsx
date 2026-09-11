@@ -26,6 +26,8 @@ import {
   LogOut,
   ArrowRight,
   Sparkles,
+  Menu,
+  X,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -38,6 +40,7 @@ export default function Sidebar({ role, teacherStatus = 'approved', pendingCount
   const pathname = usePathname();
   const router = useRouter();
   const [userData, setUserData] = useState<any>(null);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const isActive = (path: string) => pathname === path || pathname.startsWith(path + '/');
 
@@ -77,7 +80,43 @@ export default function Sidebar({ role, teacherStatus = 'approved', pendingCount
   }[role];
 
   return (
-    <aside className="w-64 bg-slate-900 border-l border-slate-800/80 min-h-screen p-4 flex flex-col justify-between shrink-0 sticky top-0 h-screen overflow-y-auto">
+    <>
+      {/* Mobile Top App Bar (Visible on phones/tablets < md) */}
+      <div className="md:hidden sticky top-0 z-40 bg-slate-950/95 backdrop-blur-md border-b border-slate-800 px-4 py-3 flex items-center justify-between shadow-lg">
+        <Link href="/" className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-xl overflow-hidden border border-blue-500/30 bg-slate-900 flex items-center justify-center">
+            <img src="/logo.png" alt="DARSLY" className="w-full h-full object-cover" />
+          </div>
+          <span className="text-base font-black tracking-tight text-white">
+            DARSLY<span className="text-blue-500">.</span>
+          </span>
+        </Link>
+
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-white flex items-center gap-1.5 text-xs font-bold"
+          >
+            {mobileOpen ? <X className="w-5 h-5 text-rose-400" /> : <Menu className="w-5 h-5 text-blue-400" />}
+            <span className="text-xs">{mobileOpen ? 'إغلاق' : 'القائمة'}</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile Overlay Drawer */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-slate-950/80 backdrop-blur-sm md:hidden transition-opacity"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
+
+      {/* Sidebar Content (Desktop: Sidebar, Mobile: Sliding Drawer) */}
+      <aside
+        className={`fixed md:sticky top-0 right-0 z-50 md:z-auto w-72 md:w-64 bg-slate-900 border-l border-slate-800/80 min-h-screen p-4 flex flex-col justify-between shrink-0 h-screen overflow-y-auto transition-transform duration-300 ${
+          mobileOpen ? 'translate-x-0' : 'translate-x-full md:translate-x-0'
+        }`}
+      >
       <div className="space-y-5">
 
         {/* ===== TOP BRAND & BACK BUTTON ===== */}
@@ -453,5 +492,6 @@ export default function Sidebar({ role, teacherStatus = 'approved', pendingCount
         </div>
       </div>
     </aside>
+    </>
   );
 }
