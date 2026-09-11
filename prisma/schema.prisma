@@ -1,0 +1,304 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  password     String
+  phone        String?
+  avatar       String?
+  role         String   @default("student") // student, teacher, admin
+  status       String   @default("active")  // student: active, teacher: pending, approved, rejected, suspended
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  teacherProfile TeacherProfile?
+  studentProfile StudentProfile?
+  courseAccesses CourseAccess[]
+  examAttempts   ExamAttempt[]
+  adminActions   AdminAction[]   @relation("AdminActions")
+  reviews        Review[]
+  notifications  Notification[]
+}
+
+model TeacherProfile {
+  id              String   @id @default(uuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title           String?  // e.g. "خبير مادة الفيزياء للثانوية العامة"
+  bio             String?
+  coverImage      String?
+  customSlug      String?  @unique
+  subjects        String   @default("[]") // JSON string of subjects
+  grades          String   @default("[]") // JSON string of grades
+  experienceYears Int      @default(0)
+  whatsapp        String?
+  facebook        String?
+  youtube         String?
+  verified        Boolean  @default(false)
+  rating          Float    @default(5.0)
+  studentCount    Int      @default(0)
+
+  courses         Course[]
+  accessCodes     AccessCode[]
+  exams           Exam[]
+  questions       Question[]
+  subscriptions   Subscription[]
+  payments        Payment[]
+  reviews         Review[]
+  centerSchedules CenterSchedule[]
+}
+
+model CenterSchedule {
+  id          String   @id @default(uuid())
+  teacherId   String
+  teacher     TeacherProfile @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  centerName  String
+  location    String
+  subject     String?
+  grade       String?
+  dayOfWeek   String
+  startTime   String
+  endTime     String
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model StudentProfile {
+  id         String  @id @default(uuid())
+  userId     String  @unique
+  user       User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  grade      String?
+  schoolName String?
+}
+
+model Course {
+  id          String   @id @default(uuid())
+  teacherId   String
+  teacher     TeacherProfile @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  title       String
+  slug        String   @unique
+  description String
+  thumbnail   String?
+  subject     String
+  grade       String
+  price       Float    @default(0.0)
+  accessType  String   @default("free") // free, paid
+  status      String   @default("published") // draft, published
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  lessons      Lesson[]
+  accessCodes  AccessCode[]
+  courseAccess CourseAccess[]
+  exams        Exam[]
+  reviews      Review[]
+}
+
+model Lesson {
+  id            String   @id @default(uuid())
+  courseId      String
+  course        Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  title         String
+  description   String?
+  videoProvider String   @default("youtube") // youtube, html5, stream
+  videoId       String
+  attachmentUrl String?
+  orderIndex    Int      @default(0)
+  createdAt     DateTime @default(now())
+
+  parts         LessonPart[]
+}
+
+model LessonPart {
+  id            String   @id @default(uuid())
+  lessonId      String
+  lesson        Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  title         String
+  description   String?
+  videoProvider String   @default("youtube")
+  videoId       String
+  orderIndex    Int      @default(0)
+  examId        String?
+  exam          Exam?    @relation(fields: [examId], references: [id], onDelete: SetNull)
+  createdAt     DateTime @default(now())
+}
+
+model AccessCode {
+  id               String   @id @default(uuid())
+  code             String   @unique
+  courseId         String
+  course           Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  teacherId        String
+  teacher          TeacherProfile @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  status           String   @default("available") // available, used, expired
+  usedByStudentId  String?
+  usedAt           DateTime?
+  createdAt        DateTime @default(now())
+  expiresAt        DateTime?
+
+  courseAccesses   CourseAccess[]
+}
+
+model CourseAccess {
+  id           String     @id @default(uuid())
+  studentId    String
+  student      User       @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  courseId     String
+  course       Course     @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  accessCodeId String?
+  accessCode   AccessCode? @relation(fields: [accessCodeId], references: [id], onDelete: SetNull)
+  grantedAt    DateTime   @default(now())
+  status       String     @default("active") // active, revoked
+}
+
+model Exam {
+  id              String   @id @default(uuid())
+  courseId        String?
+  course          Course?  @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  teacherId       String
+  teacher         TeacherProfile @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  title           String
+  durationMinutes Int      @default(30)
+  passingScore    Int      @default(50)
+  questionMode    String   @default("mixed") // mcq, essay, mixed
+  mode            String   @default("exam")  // practice, exam
+  status          String   @default("published")
+  createdAt       DateTime @default(now())
+
+  examQuestions   ExamQuestion[]
+  attempts        ExamAttempt[]
+  lessonParts     LessonPart[]
+}
+
+model Question {
+  id           String   @id @default(uuid())
+  teacherId    String
+  teacher      TeacherProfile @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  questionText String
+  imageUrl     String?
+  type         String   @default("mcq") // mcq, essay
+  subject      String
+  grade        String
+  marks        Float    @default(1.0)
+  explanation  String?
+  createdAt    DateTime @default(now())
+
+  options      QuestionOption[]
+  examQuestions ExamQuestion[]
+  studentAnswers StudentAnswer[]
+}
+
+model QuestionOption {
+  id         String   @id @default(uuid())
+  questionId String
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  optionKey  String   // A, B, C, D
+  optionText String
+  imageUrl   String?
+  isCorrect  Boolean  @default(false)
+}
+
+model ExamQuestion {
+  id         String   @id @default(uuid())
+  examId     String
+  exam       Exam     @relation(fields: [examId], references: [id], onDelete: Cascade)
+  questionId String
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  orderIndex Int      @default(0)
+}
+
+model ExamAttempt {
+  id          String   @id @default(uuid())
+  examId      String
+  exam        Exam     @relation(fields: [examId], references: [id], onDelete: Cascade)
+  studentId   String
+  student     User     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  score       Float    @default(0.0)
+  totalMarks  Float    @default(0.0)
+  passed      Boolean  @default(false)
+  startedAt   DateTime @default(now())
+  submittedAt DateTime?
+
+  answers     StudentAnswer[]
+}
+
+model StudentAnswer {
+  id             String      @id @default(uuid())
+  attemptId      String
+  attempt        ExamAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  questionId     String
+  question       Question    @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  selectedOption String?     // A, B, C, D for MCQ
+  essayResponse  String?     // Text response for Essay
+  awardedMarks   Float       @default(0.0)
+  feedback       String?
+  gradedAt       DateTime?
+}
+
+model Subscription {
+  id          String   @id @default(uuid())
+  teacherId   String
+  teacher     TeacherProfile @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  plan        String   @default("pro") // starter, pro, premium
+  status      String   @default("active") // pending, active, expired, cancelled
+  startDate   DateTime @default(now())
+  renewalDate DateTime
+  createdAt   DateTime @default(now())
+
+  payments    Payment[]
+}
+
+model Payment {
+  id             String   @id @default(uuid())
+  subscriptionId String?
+  subscription   Subscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+  teacherId      String
+  teacher        TeacherProfile @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  amount         Float
+  paymentMethod  String   @default("fawry")
+  status         String   @default("completed")
+  createdAt      DateTime @default(now())
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  teacherId String
+  teacher   TeacherProfile @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  courseId  String?
+  course    Course?  @relation(fields: [courseId], references: [id], onDelete: SetNull)
+  studentId String
+  student   User     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  rating    Int      @default(5)
+  comment   String
+  createdAt DateTime @default(now())
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model AdminAction {
+  id         String   @id @default(uuid())
+  adminId    String
+  admin      User     @relation("AdminActions", fields: [adminId], references: [id], onDelete: Cascade)
+  action     String   // e.g. "TEACHER_APPROVED", "TEACHER_REJECTED", "TEACHER_SUSPENDED"
+  targetType String   // e.g. "TEACHER", "COURSE", "USER"
+  targetId   String
+  details    String?
+  createdAt  DateTime @default(now())
+}
