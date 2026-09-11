@@ -198,7 +198,7 @@ export default async function HomePage() {
           {teachers.map((t) => {
             const profile = t.teacherProfile;
             const subjects = profile?.subjects ? JSON.parse(profile.subjects) : ['مادة عامة'];
-            const grades = profile?.grades ? JSON.parse(profile.grades) : ['الصف الثالث الثانوي'];
+            const grades = profile?.grades ? JSON.parse(profile.grades) : ['مدرس ثانوي'];
 
             return (
               <TeacherCard

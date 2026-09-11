@@ -37,7 +37,7 @@ export async function POST(request: Request) {
                 create: {
                   bio: bio || 'مدرس في منصة درسلي التعليمية',
                   subjects: JSON.stringify(subjects || (subject ? [subject] : ['مادة عامة'])),
-                  grades: JSON.stringify(grades || (grade ? [grade] : ['الصف الثالث الثانوي'])),
+                  grades: JSON.stringify(grades || (grade ? [grade] : ['مدرس ثانوي'])),
                   experienceYears: experienceYears ? parseInt(experienceYears) : 1,
                   verified: false,
                 },
@@ -46,7 +46,7 @@ export async function POST(request: Request) {
           : {
               studentProfile: {
                 create: {
-                  grade: grade || 'الصف الثالث الثانوي',
+                  grade: grade || 'المرحلة الثانوية',
                 },
               },
             }),

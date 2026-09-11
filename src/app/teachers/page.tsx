@@ -107,25 +107,11 @@ export default async function TeachersPage({ searchParams }: PageProps) {
               defaultValue={gradeFilter}
               className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500"
             >
-              <option value="">جميع المراحل والصفوف</option>
-              <optgroup label="المرحلة الثانوية">
-                <option value="الصف الثالث الثانوي">الصف الثالث الثانوي</option>
-                <option value="الصف الثاني الثانوي">الصف الثاني الثانوي</option>
-                <option value="الصف الأول الثانوي">الصف الأول الثانوي</option>
-              </optgroup>
-              <optgroup label="المرحلة الإعدادية">
-                <option value="الصف الثالث الإعدادي">الصف الثالث الإعدادي</option>
-                <option value="الصف الثاني الإعدادي">الصف الثاني الإعدادي</option>
-                <option value="الصف الأول الإعدادي">الصف الأول الإعدادي</option>
-              </optgroup>
-              <optgroup label="المرحلة الابتدائية">
-                <option value="الصف السادس الابتدائي">الصف السادس الابتدائي</option>
-                <option value="الصف الخامس الابتدائي">الصف الخامس الابتدائي</option>
-                <option value="الصف الرابع الابتدائي">الصف الرابع الابتدائي</option>
-                <option value="الصف الثالث الابتدائي">الصف الثالث الابتدائي</option>
-                <option value="الصف الثاني الابتدائي">الصف الثاني الابتدائي</option>
-                <option value="الصف الأول الابتدائي">الصف الأول الابتدائي</option>
-              </optgroup>
+              <option value="">جميع المراحل الدراسية</option>
+              <option value="مدرس ثانوي">مدرس ثانوي (المرحلة الثانوية)</option>
+              <option value="مدرس إعدادي">مدرس إعدادي (المرحلة الإعدادية)</option>
+              <option value="مدرس ابتدائي">مدرس ابتدائي (المرحلة الابتدائية)</option>
+              <option value="مدرس جامعي">مدرس جامعي (المرحلة الجامعية)</option>
             </select>
           </div>
 

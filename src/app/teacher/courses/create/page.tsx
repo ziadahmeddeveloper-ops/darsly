@@ -32,7 +32,7 @@ export default function TeacherCreateCoursePage() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [subject, setSubject] = useState('رياضيات');
-  const [grade, setGrade] = useState('الصف الثالث الثانوي');
+  const [grade, setGrade] = useState('المرحلة الثانوية');
   const [accessType, setAccessType] = useState<'paid' | 'free'>('paid');
   const [price, setPrice] = useState('350');
   const [availableExams, setAvailableExams] = useState<ExamItem[]>([]);
@@ -294,21 +294,10 @@ export default function TeacherCreateCoursePage() {
                   onChange={(e) => setGrade(e.target.value)}
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500"
                 >
-                  <optgroup label="ثانوي">
-                    <option value="الصف الثالث الثانوي">الصف الثالث الثانوي</option>
-                    <option value="الصف الثاني الثانوي">الصف الثاني الثانوي</option>
-                    <option value="الصف الأول الثانوي">الصف الأول الثانوي</option>
-                  </optgroup>
-                  <optgroup label="إعدادي">
-                    <option value="الصف الثالث الإعدادي">الصف الثالث الإعدادي</option>
-                    <option value="الصف الثاني الإعدادي">الصف الثاني الإعدادي</option>
-                    <option value="الصف الأول الإعدادي">الصف الأول الإعدادي</option>
-                  </optgroup>
-                  <optgroup label="ابتدائي">
-                    <option value="الصف السادس الابتدائي">الصف السادس الابتدائي</option>
-                    <option value="الصف الخامس الابتدائي">الصف الخامس الابتدائي</option>
-                    <option value="الصف الرابع الابتدائي">الصف الرابع الابتدائي</option>
-                  </optgroup>
+                  <option value="المرحلة الثانوية">المرحلة الثانوية (ثانوي)</option>
+                  <option value="المرحلة الإعدادية">المرحلة الإعدادية (إعدادي)</option>
+                  <option value="المرحلة الابتدائية">المرحلة الابتدائية (ابتدائي)</option>
+                  <option value="المرحلة الجامعية">المرحلة الجامعية (جامعي / كليات)</option>
                 </select>
               </div>
             </div>
